@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
+import Sidebar from "./components/Sidebar";
 import { load_google_maps, load_places } from "./utils";
 
 class App extends Component {
@@ -55,7 +56,6 @@ class App extends Component {
           this.infowindow.setContent(marker.name);
           this.map.setCenter(marker.position);
           this.infowindow.open(this.map, marker);
-          this.map.panBy(0, -125);
         });
 
         this.markers.push(marker);
@@ -86,30 +86,11 @@ class App extends Component {
     return (
       <div className="app">
         <div id="map" />
-        <div id="sidebar">
-          <input
-            placeholder="Filter content"
-            value={this.state.query}
-            onChange={e => {
-              this.filterVenues(e.target.value);
-            }}
-          />
-          <br />
-          <br />
-          {this.state.filteredVenues &&
-            this.state.filteredVenues.length > 0 &&
-            this.state.filteredVenues.map((venue, index) => (
-              <div
-                className="venue-item"
-                key={venue.id}
-                onClick={() => {
-                  this.listItemClick(venue);
-                }}
-              >
-                {venue.name}
-              </div>
-            ))}
-        </div>
+        <Sidebar
+          filterVenues={this.filterVenues}
+          filteredVenues={this.state.filteredVenues}
+          listItemClick={this.listItemClick}
+        />
       </div>
     );
   }
