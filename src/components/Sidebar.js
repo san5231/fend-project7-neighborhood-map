@@ -4,10 +4,12 @@ class Sidebar extends Component {
   render() {
     let displaySidebar = this.props.sidebarOpen ? "block" : "none";
     return (
-      <div id="sidebar" style={{ display: displaySidebar }}>
+      <div tabIndex="0" id="sidebar" style={{ display: displaySidebar }}>
         <input
+          role="searchbox"
+          aria-label="filter contents"
           id="filter"
-          placeholder="Filter content"
+          placeholder="Filter contents"
           value={this.props.query}
           onChange={e => {
             this.props.filterVenues(e.target.value);
@@ -15,13 +17,18 @@ class Sidebar extends Component {
         />
         <br />
         <br />
+
         {this.props.filteredVenues &&
           this.props.filteredVenues.length > 0 &&
           this.props.filteredVenues.map((venue, index) => (
             <div
+              tabIndex="0"
               className="venue-item"
               key={venue.id}
               onClick={() => {
+                this.props.listItemClick(venue);
+              }}
+              onKeyPress={() => {
                 this.props.listItemClick(venue);
               }}
             >

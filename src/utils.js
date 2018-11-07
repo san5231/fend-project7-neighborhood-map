@@ -14,8 +14,8 @@ export const load_google_maps = () => {
 };
 
 export const load_places = () => {
-  let city = "San Francisco, CA";
-  let query = "Asian+restaurant";
+  let city = "Fremont, CA";
+  let query = "coffee";
   var apiURL = `https://api.foursquare.com/v2/venues/search?client_id=N1IAMKZUIK1AUHKRFGFBKPQ2YKDSBAKS4NTER5SYZN5CROR1&client_secret=4MKLXVLU2FGZQVRMAEDC15P0TFJGSCY3ZUYUZ0KHQQQLQ5R3&client_secret=1YGUIYW5OFI5ULNZYYIUAXZMBGJCRW4KMIF2NU1ULNKD2SNN&v=20130815%20&limit=50&near=${city}&query=${query}`;
   return fetch(apiURL).then(resp => resp.json());
 };

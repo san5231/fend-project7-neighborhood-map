@@ -20,14 +20,16 @@
   max-width: 80%;
   margin: 15px 5px 0px 5px;
 }
+
 .venue-item {
   padding: 5px;
   margin-bottom: 5px;
-  border: 1px solid lightgrey;
+  border: 2px solid lightgrey;
 }
 .venue-item:hover {
-  box-shadow: 5px 5px 2px grey;
-  background-color: #80dfff;
+  box-shadow: 2px 2px 2px grey;
+  background-color: #663300;
+  color: #ffe6cc;
 }
 .transition {
   -webkit-transition: transition 0.3s;
@@ -44,8 +46,6 @@
   line-height: 60px;
   vertical-align: middle;
   padding: 0px 15px;
-  word-spacing: 1.5px;
-  letter-spacing: 1.5px;
   cursor: pointer;
 }
 #header {
@@ -55,14 +55,13 @@
   line-height: 60px;
   vertical-align: middle;
   padding: 0px 20px;
-  letter-spacing: 1.5px;
   display: inline-block;
 }
 #navbar {
   position: relative;
   z-index: 100;
   box-shadow: 0px 1px 1px grey;
-  background: black;
+  background: #4d2600;
 }
 
 @media (max-width: 450px) {

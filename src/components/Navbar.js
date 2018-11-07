@@ -2,11 +2,15 @@ import React from "react";
 const Navbar = props => {
   return (
     <nav id="navbar">
-      <h2 id="header">Neighborhood Maps</h2>
+      <h2 id="header">Bay Area Coffee Maps</h2>
       <h2
+        tabIndex="0"
         className="transition menu-text"
-        title={props.menuText + "Sidebar"}
+        title={props.menuText + " Sidebar"}
         onClick={() => {
+          props.toggleSideBar();
+        }}
+        onKeyPress={() => {
           props.toggleSideBar();
         }}
       >
