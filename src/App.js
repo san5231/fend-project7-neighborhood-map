@@ -1,14 +1,23 @@
 import React, { Component } from "react";
 import "./App.css";
 import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
 import { load_google_maps, load_places } from "./utils";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      query: ""
+      query: "",
+      filteredVenues: null,
+      sidebarOpen: true
     };
+    this.filterVenues = this.filterVenues.bind(this);
+    this.toggleSideBar = this.toggleSideBar.bind(this);
+  }
+
+  toggleSideBar() {
+    this.setState(state => ({ sidebarOpen: !state.sidebarOpen }));
   }
   componentDidMount() {
     let googleMapsPromise = load_google_maps();
@@ -23,7 +32,7 @@ class App extends Component {
       this.infowindow = new google.maps.InfoWindow();
 
       this.map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 9,
+        zoom: 12,
         scrollwheel: true,
         center: {
           lat: this.venues[0].location.lat,
@@ -40,7 +49,6 @@ class App extends Component {
           name: venue.name,
           animation: google.maps.Animation.DROP
         });
-
         marker.addListener("click", () => {
           if (marker.getAnimation() !== null) {
             marker.setAnimation(null);
@@ -68,7 +76,14 @@ class App extends Component {
     this.infowindow.setContent(marker.name);
     this.map.setCenter(marker.position);
     this.infowindow.open(this.map, marker);
-    this.map.panBy(0, -125);
+    if (marker.getAnimation() !== null) {
+      marker.setAnimation(null);
+    } else {
+      marker.setAnimation(this.google.maps.Animation.BOUNCE);
+    }
+    setTimeout(() => {
+      marker.setAnimation(null);
+    }, 1500);
   };
   filterVenues(query) {
     let f = this.venues.filter(venue =>
@@ -79,14 +94,26 @@ class App extends Component {
         ? marker.setVisible(true)
         : marker.setVisible(false);
     });
-    this.setState({ filteredVenues: f, query });
+    this.setState({ filteredVenues: f, query: query });
   }
 
   render() {
+    let displaySidebar = this.state.sidebarOpen ? "block" : "none";
+    let menuText = this.state.sidebarOpen ? "Close" : "Open";
     return (
       <div className="app">
+        <Navbar
+          menuText={menuText}
+          toggleSideBar={this.toggleSideBar}
+          sidebarOpen={this.state.sidebarOpen}
+        />
         <div id="map" />
         <Sidebar
+          menuText={menuText}
+          displaySidebar={displaySidebar}
+          sidebarOpen={this.state.sidebarOpen}
+          toggleSideBar={this.toggleSideBar}
+          query={this.state.query}
           filterVenues={this.filterVenues}
           filteredVenues={this.state.filteredVenues}
           listItemClick={this.listItemClick}
