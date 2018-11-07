@@ -14,6 +14,12 @@
   top: 60px;
   display: block;
 }
+#filter {
+  font-size: 1em;
+  width: 300px;
+  max-width: 80%;
+  margin: 15px 5px 0px 5px;
+}
 .venue-item {
   padding: 5px;
   margin-bottom: 5px;

@@ -6,6 +6,7 @@ class Sidebar extends Component {
     return (
       <div id="sidebar" style={{ display: displaySidebar }}>
         <input
+          id="filter"
           placeholder="Filter content"
           value={this.props.query}
           onChange={e => {

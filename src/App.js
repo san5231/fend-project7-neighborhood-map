@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./App.css";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
-import { load_google_maps, load_places } from "./utils";
+import { load_google_maps, load_places, getGoogleImage } from "./utils";
 
 class App extends Component {
   constructor(props) {
@@ -14,6 +14,7 @@ class App extends Component {
     };
     this.filterVenues = this.filterVenues.bind(this);
     this.toggleSideBar = this.toggleSideBar.bind(this);
+    this.listItemClick = this.listItemClick.bind(this);
   }
 
   toggleSideBar() {
@@ -30,6 +31,7 @@ class App extends Component {
       this.google = google;
       this.markers = [];
       this.infowindow = new google.maps.InfoWindow();
+      this.info_windows = [];
 
       this.map = new google.maps.Map(document.getElementById("map"), {
         zoom: 12,
@@ -49,6 +51,13 @@ class App extends Component {
           name: venue.name,
           animation: google.maps.Animation.DROP
         });
+        let infoContent = `<div class="info-content">
+            <h4>${venue.name}</h4>
+            <p>${venue.location.formattedAddress[0]},</br>
+            ${venue.location.formattedAddress[1]}</p>
+            <img class="venue-img" alt="${venue.name}"
+            src="${getGoogleImage(venue)}"
+         </div>`;
         marker.addListener("click", () => {
           if (marker.getAnimation() !== null) {
             marker.setAnimation(null);
@@ -61,19 +70,26 @@ class App extends Component {
         });
 
         google.maps.event.addListener(marker, "click", () => {
-          this.infowindow.setContent(marker.name);
+          this.infowindow.setContent(infoContent);
           this.map.setCenter(marker.position);
           this.infowindow.open(this.map, marker);
         });
 
         this.markers.push(marker);
+        this.info_windows.push({
+          id: venue.id,
+          name: venue.name,
+          contents: infoContent
+        });
       });
       this.setState({ filteredVenues: this.venues });
     });
   }
-  listItemClick = venue => {
+  listItemClick(venue) {
     let marker = this.markers.filter(m => m.id === venue.id)[0];
-    this.infowindow.setContent(marker.name);
+    let info_obj = this.info_windows.filter(i => i.id === venue.id)[0];
+    let infoContent = (info_obj && info_obj.contents) || "nothing...";
+    this.infowindow.setContent(infoContent);
     this.map.setCenter(marker.position);
     this.infowindow.open(this.map, marker);
     if (marker.getAnimation() !== null) {
@@ -84,7 +100,7 @@ class App extends Component {
     setTimeout(() => {
       marker.setAnimation(null);
     }, 1500);
-  };
+  }
   filterVenues(query) {
     let f = this.venues.filter(venue =>
       venue.name.toLowerCase().includes(query.toLowerCase())
