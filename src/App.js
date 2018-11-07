@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
+import Map from "./components/Map";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import { load_google_maps, load_places, getGoogleImage } from "./utils";
@@ -34,11 +35,11 @@ class App extends Component {
       this.info_windows = [];
 
       this.map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 12,
+        zoom: 10,
         scrollwheel: true,
         center: {
-          lat: this.venues[0].location.lat,
-          lng: this.venues[0].location.lng
+          lat: this.venues[5].location.lat,
+          lng: this.venues[5].location.lng
         }
       });
 
@@ -55,6 +56,7 @@ class App extends Component {
             <h4>${venue.name}</h4>
             <p>${venue.location.formattedAddress[0]},</br>
             ${venue.location.formattedAddress[1]}</p>
+
             <img class="venue-img" alt="${venue.name}"
             src="${getGoogleImage(venue)}"
          </div>`;
@@ -73,6 +75,7 @@ class App extends Component {
           this.infowindow.setContent(infoContent);
           this.map.setCenter(marker.position);
           this.infowindow.open(this.map, marker);
+          this.map.panBy(0, -125);
         });
 
         this.markers.push(marker);
@@ -123,7 +126,6 @@ class App extends Component {
           toggleSideBar={this.toggleSideBar}
           sidebarOpen={this.state.sidebarOpen}
         />
-        <div id="map" />
         <Sidebar
           menuText={menuText}
           displaySidebar={displaySidebar}
@@ -134,6 +136,7 @@ class App extends Component {
           filteredVenues={this.state.filteredVenues}
           listItemClick={this.listItemClick}
         />
+        <Map />
       </div>
     );
   }
