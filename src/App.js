@@ -3,7 +3,7 @@ import "./App.css";
 import Map from "./components/Map";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
-import { load_google_maps, load_places, getGoogleImage } from "./utils";
+import * as utils from "./utils";
 
 class App extends Component {
   constructor(props) {
@@ -11,7 +11,7 @@ class App extends Component {
     this.state = {
       query: "",
       filteredVenues: null,
-      sidebarOpen: true
+      sidebarOpen: false
     };
     this.filterVenues = this.filterVenues.bind(this);
     this.toggleSideBar = this.toggleSideBar.bind(this);
@@ -22,79 +22,70 @@ class App extends Component {
     this.setState(state => ({ sidebarOpen: !state.sidebarOpen }));
   }
   componentDidMount() {
-    let googleMapsPromise = load_google_maps();
-    let placesPromise = load_places();
+    let googleMapsPromise = utils.load_google_maps();
+    let placesPromise = utils.load_places();
 
-    Promise.all([googleMapsPromise, placesPromise]).then(values => {
-      let google = values[0];
-      this.venues = values[1].response.venues;
+    Promise.all([googleMapsPromise, placesPromise])
+      .then(values => {
+        let google = values[0];
+        let venues = values[1];
 
-      this.google = google;
-      this.markers = [];
-      this.infowindow = new google.maps.InfoWindow();
-      this.info_windows = [];
+        this.google = google;
+        this.venues = venues;
+        this.markers = [];
+        this.infowindow = new google.maps.InfoWindow();
+        this.info_windows = [];
 
-      this.map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 10,
-        scrollwheel: true,
-        center: {
-          lat: this.venues[5].location.lat,
-          lng: this.venues[5].location.lng
-        }
-      });
-
-      this.venues.forEach(venue => {
-        let marker = new google.maps.Marker({
-          position: { lat: venue.location.lat, lng: venue.location.lng },
-          map: this.map,
-          venue: venue,
-          id: venue.id,
-          name: venue.name,
-          animation: google.maps.Animation.DROP
+        this.map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 10,
+          scrollwheel: true,
+          center: {
+            lat: 37.647743,
+            lng: -122.268979
+          }
         });
-        let infoContent = `<div class="info-content">
+
+        venues.forEach(venue => {
+          let marker = new google.maps.Marker({
+            position: { lat: venue.location.lat, lng: venue.location.lng },
+            map: this.map,
+            venue: venue,
+            id: venue.id,
+            name: venue.name,
+            animation: google.maps.Animation.DROP
+          });
+          let infoContent = `<div class="info-content">
             <h4>${venue.name}</h4>
             <p>${venue.location.formattedAddress[0]},</br>
             ${venue.location.formattedAddress[1]}</p>
 
             <img class="venue-img" alt="${venue.name}"
-            src="${getGoogleImage(venue)}"
+            src="${utils.getGoogleImage(venue)}"
          </div>`;
-        marker.addListener("click", () => {
-          if (marker.getAnimation() !== null) {
-            marker.setAnimation(null);
-          } else {
-            marker.setAnimation(google.maps.Animation.BOUNCE);
-          }
-          setTimeout(() => {
-            marker.setAnimation(null);
-          }, 1500);
-        });
 
-        google.maps.event.addListener(marker, "click", () => {
-          this.infowindow.setContent(infoContent);
-          this.map.setCenter(marker.position);
-          this.infowindow.open(this.map, marker);
-          this.map.panBy(0, -125);
-        });
+          google.maps.event.addListener(marker, "click", () => {
+            this.handleClick(this.infowindow, this.map, marker, infoContent);
+          });
 
-        this.markers.push(marker);
-        this.info_windows.push({
-          id: venue.id,
-          name: venue.name,
-          contents: infoContent
+          this.markers.push(marker);
+          this.info_windows.push({
+            id: venue.id,
+            name: venue.name,
+            contents: infoContent
+          });
         });
+        this.setState({ sidebarOpen: true, filteredVenues: this.venues });
+      })
+      .catch(error => {
+        console.log(error);
+        alert("Error loading page");
       });
-      this.setState({ filteredVenues: this.venues });
-    });
   }
-  listItemClick(venue) {
-    let marker = this.markers.filter(m => m.id === venue.id)[0];
-    let info_obj = this.info_windows.filter(i => i.id === venue.id)[0];
-    let infoContent = (info_obj && info_obj.contents) || "nothing...";
-    this.infowindow.setContent(infoContent);
-    this.map.setCenter(marker.position);
-    this.infowindow.open(this.map, marker);
+  handleClick(infowindow, map, marker, infoContent) {
+    infowindow.setContent(infoContent);
+    map.setCenter(marker.position);
+    infowindow.open(map, marker);
+    map.panBy(0, -125);
     if (marker.getAnimation() !== null) {
       marker.setAnimation(null);
     } else {
@@ -103,6 +94,13 @@ class App extends Component {
     setTimeout(() => {
       marker.setAnimation(null);
     }, 1500);
+  }
+
+  listItemClick(venue) {
+    let marker = this.markers.filter(m => m.id === venue.id)[0];
+    let info_obj = this.info_windows.filter(i => i.id === venue.id)[0];
+    let infoContent = (info_obj && info_obj.contents) || "nothing...";
+    this.handleClick(this.infowindow, this.map, marker, infoContent);
   }
   filterVenues(query) {
     let f = this.venues.filter(venue =>

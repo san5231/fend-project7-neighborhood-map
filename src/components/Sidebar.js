@@ -7,9 +7,9 @@ class Sidebar extends Component {
       <div tabIndex="0" id="sidebar" style={{ display: displaySidebar }}>
         <input
           role="searchbox"
-          aria-label="filter contents"
+          aria-label="filter Coffee Shops"
           id="filter"
-          placeholder="Filter contents"
+          placeholder="Filter Coffee Shops"
           value={this.props.query}
           onChange={e => {
             this.props.filterVenues(e.target.value);
